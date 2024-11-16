@@ -1,56 +1,169 @@
-# Contributing to ShortFactory
+# Contributing to ShortFactory 🎬
 
-We love your input! We want to make contributing to ShortFactory as easy and transparent as possible, whether it's:
+Thank you for your interest in contributing to ShortFactory! This document provides guidelines and instructions for contributing.
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+## 🌟 Ways to Contribute
 
-## Development Process
+1. Report bugs and issues
+2. Suggest new features
+3. Improve documentation
+4. Submit code changes
+5. Share example videos and templates
 
-We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+## 🚀 Getting Started
 
-1. Fork the repo and create your branch from `main`
-2. If you've added code that should be tested, add tests
-3. If you've changed APIs, update the documentation
-4. Ensure the test suite passes
-5. Make sure your code follows our style guide
-6. Issue that pull request!
+1. Fork the repository
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/shortfactory.git
+   cd shortfactory
+   ```
+3. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   # or
+   .\venv\Scripts\activate  # Windows
+   ```
+4. Install development dependencies:
+   ```bash
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt  # Development dependencies
+   ```
 
-## Pull Request Process
+## 📝 Development Guidelines
 
-1. Update the README.md with details of changes if needed
-2. Update the requirements.txt if you add any dependencies
-3. The PR will be merged once you have the sign-off of two other developers
+### Code Style
+- Follow PEP 8 guidelines
+- Use type hints
+- Add docstrings to functions and classes
+- Keep functions focused and modular
 
-## Any Contributions You Make Will Be Under the MIT Software License
+### Testing
+1. Write tests for new features:
+   ```bash
+   pytest tests/
+   ```
+2. Ensure all tests pass before submitting
+3. Maintain or improve code coverage
 
-In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project. Feel free to contact the maintainers if that's a concern.
+### Documentation
+- Update relevant documentation
+- Add docstrings to new functions
+- Include example usage where appropriate
+- Keep README.md up to date
 
-## Report Bugs Using GitHub's [Issue Tracker](https://github.com/Ashwin182607/shortfactory/issues)
+## 🔄 Pull Request Process
 
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/Ashwin182607/shortfactory/issues/new).
+1. Create a new branch:
+   ```bash
+   git checkout -b feature/your-feature
+   # or
+   git checkout -b fix/your-fix
+   ```
 
-## Write Bug Reports With Detail, Background, and Sample Code
+2. Make your changes:
+   - Write clear commit messages
+   - Keep commits focused and atomic
+   - Reference issues if applicable
 
-**Great Bug Reports** tend to have:
+3. Update documentation:
+   - Add/update docstrings
+   - Update README if needed
+   - Add to CHANGELOG.md
 
-- A quick summary and/or background
-- Steps to reproduce
-  - Be specific!
-  - Give sample code if you can
-- What you expected would happen
-- What actually happens
-- Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
+4. Run tests and checks:
+   ```bash
+   # Run tests
+   pytest
 
-## Use a Consistent Coding Style
+   # Check code style
+   black .
+   isort .
+   flake8 .
+   ```
 
-* Use [Black](https://github.com/psf/black) for Python code formatting
-* Use [isort](https://pycqa.github.io/isort/) for import sorting
-* Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) guidelines
+5. Push changes:
+   ```bash
+   git push origin your-branch-name
+   ```
 
-## License
+6. Create pull request:
+   - Use a clear title and description
+   - Reference related issues
+   - Include any necessary screenshots
+   - List any breaking changes
 
-By contributing, you agree that your contributions will be licensed under its MIT License.
+## 🐛 Reporting Issues
+
+When reporting issues, please include:
+
+1. Description of the issue
+2. Steps to reproduce
+3. Expected behavior
+4. Actual behavior
+5. System information:
+   - Python version
+   - Operating system
+   - Package versions
+   - GPU information (if relevant)
+
+## 🎨 Style Guide
+
+### Python Code Style
+```python
+# Good example
+def process_video(
+    input_path: str,
+    output_path: str,
+    duration: float = 60.0
+) -> bool:
+    """
+    Process a video file with specified parameters.
+
+    Args:
+        input_path: Path to input video
+        output_path: Path to save processed video
+        duration: Video duration in seconds
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Implementation
+        return True
+    except Exception as e:
+        logger.error(f"Video processing failed: {e}")
+        return False
+```
+
+### Commit Messages
+- Use present tense ("Add feature" not "Added feature")
+- Be descriptive but concise
+- Reference issues when applicable
+- Use prefixes:
+  - feat: New feature
+  - fix: Bug fix
+  - docs: Documentation
+  - style: Code style
+  - refactor: Code refactoring
+  - test: Testing
+  - chore: Maintenance
+
+## 📚 Resources
+
+- [Python Style Guide (PEP 8)](https://www.python.org/dev/peps/pep-0008/)
+- [Type Hints (PEP 484)](https://www.python.org/dev/peps/pep-0484/)
+- [Docstring Conventions (PEP 257)](https://www.python.org/dev/peps/pep-0257/)
+- [Git Commit Messages](https://chris.beams.io/posts/git-commit/)
+
+## ❓ Questions?
+
+Feel free to:
+1. Open an issue for discussion
+2. Join our community discussions
+3. Contact maintainers
+
+## 📜 License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
