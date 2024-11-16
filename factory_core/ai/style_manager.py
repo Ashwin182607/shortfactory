@@ -13,7 +13,7 @@ from diskcache import Cache
 from fastai.vision.all import load_learner
 from tenacity import retry, stop_after_attempt, wait_exponential
 from torchvision import transforms
-from transformers import AutoImageProcessor, AutoModelForImageProcessing
+from transformers import AutoImageProcessor, AutoModelForImageClassification
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +167,7 @@ class StyleManager:
         """Load a diffusion model."""
         try:
             processor = AutoImageProcessor.from_pretrained(model_config["model_id"])
-            model = AutoModelForImageProcessing.from_pretrained(
+            model = AutoModelForImageClassification.from_pretrained(
                 model_config["model_id"],
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
             )
