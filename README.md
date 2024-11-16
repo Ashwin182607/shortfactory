@@ -50,7 +50,14 @@ PIXABAY_API_KEY=your_pixabay_api_key
 
 The fastest way to get started is using our Google Colab notebook:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/shortfactory/blob/main/ShortFactory.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ashwin182607/shortfactory/blob/main/ShortFactory.ipynb?raw=true)
+
+**Note**: If the Colab link doesn't work directly, you can:
+1. Go to [Google Colab](https://colab.research.google.com)
+2. Click File → Open Notebook
+3. Select "GitHub" tab
+4. Enter: `Ashwin182607/shortfactory`
+5. Select `ShortFactory.ipynb`
 
 1. Click the "Open in Colab" button above
 2. Get your API keys:
