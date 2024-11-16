@@ -1,0 +1,62 @@
+# ShortFactory Configuration
+
+# Asset Management
+assets:
+  video_dir: "assets/videos"
+  music_dir: "assets/music"
+  image_dir: "assets/images"
+  cache_dir: ".cache/shortfactory"
+
+# Video Settings
+video:
+  default_fps: 30
+  default_resolution:
+    width: 1080
+    height: 1920  # Portrait for shorts/reels
+  max_duration: 60  # seconds
+  min_duration: 15  # seconds
+  formats:
+    - "mp4"
+    - "mov"
+
+# Audio Settings
+audio:
+  sample_rate: 44100
+  channels: 2
+  formats:
+    - "mp3"
+    - "wav"
+    - "m4a"
+
+# Model Settings
+models:
+  cache_dir: ".cache/models"
+  default_device: "cuda"  # or "cpu"
+  precision: "float16"  # or "float32"
+
+# API Settings
+api:
+  retries: 3
+  timeout: 30  # seconds
+  services:
+    - "pexels"
+    - "pixabay"
+    - "unsplash"
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/shortfactory.log"
+  format: "[%(asctime)s] %(levelname)s [%(name)s] %(message)s"
+
+# Cache Settings
+cache:
+  max_size: 10GB
+  ttl: 86400  # 24 hours in seconds
+  
+# Web Interface
+web:
+  host: "0.0.0.0"
+  port: 7860
+  debug: false
+  theme: "default"
