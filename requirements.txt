@@ -30,9 +30,10 @@ safetensors>=0.3.1  # Safer model loading
 pytube>=15.0.0  # YouTube video download
 yt-dlp>=2023.3.4  # Backup video downloader
 pexels-api>=1.0.1
-pixabay-python==1.1.0
+pixabay-python==1.1.0  # Fixed version due to compatibility
 python-unsplash>=1.1.0
-freemusicarchive>=0.2.0
+mutagen>=1.46.0  # Audio file handling
+pydub>=0.25.1  # Audio processing
 
 # Caching and Storage
 diskcache>=5.6.1
@@ -49,4 +50,3 @@ APScheduler>=3.10.1  # Scheduled tasks
 pytest>=7.3.1
 black>=23.3.0
 isort>=5.12.0
-mypy>=1.3.0
