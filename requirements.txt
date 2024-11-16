@@ -39,7 +39,8 @@ pydub>=0.25.1  # Audio processing
 diskcache>=5.6.1
 requests-cache>=1.0.1
 aiofiles>=23.1.0  # Async file operations
-fsspec>=2023.5.0  # Filesystem abstraction
+fsspec==2024.10.0  # Filesystem abstraction
+gcsfs==2024.10.0  # Google Cloud Storage support
 
 # Error Handling and Monitoring
 tenacity>=8.2.2  # Retry handling
