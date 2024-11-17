@@ -1,30 +1,42 @@
 # Core Dependencies
 torch>=2.0.1
-torchvision>=0.15.2
 torchaudio>=2.0.2
 transformers>=4.30.2
-gradio>=3.35.2
-moviepy>=1.0.3
+gradio==3.38.0
+gradio_client==0.2.10
+moviepy==1.0.3
 python-dotenv>=1.0.0
+openai==1.10.0
+
+# Database and Caching
+tinydb>=4.8.0
+tinymongo>=0.2.3
+diskcache>=5.6.1
 
 # Asset Management
 pexels-api>=1.0.1
-pixabay-python==1.1.0  # Fixed version as 2.1 doesn't exist
+pixabay-python==1.1.0
 python-unsplash>=1.1.0
 
 # Image and Video Processing
-Pillow>=9.5.0
+Pillow==9.0.0
 opencv-python>=4.7.0.72
 numpy>=1.24.3
 imageio>=2.31.1
 imageio-ffmpeg>=0.4.8
+ffmpeg-python>=0.2.0
+protobuf==3.20.3
 
 # Audio Processing
 soundfile>=0.12.1
 librosa>=0.10.0.post2
 audioread>=3.0.0
+whisper-timestamped>=1.0.0
+edge-tts>=6.1.9
+TTS==0.22.0
 
-# Text and Script Generation
+# Text Processing
+tiktoken>=0.5.1
 nltk>=3.8.1
 spacy>=3.5.3
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
@@ -33,13 +45,14 @@ en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_
 tqdm>=4.65.0
 requests>=2.31.0
 python-magic>=0.4.27
-ffmpeg-python>=0.2.0
-diskcache>=5.6.1  # Added explicitly
 tenacity>=8.2.2
 typing-extensions>=4.5.0
 filelock>=3.12.0
 pyyaml>=6.0
 regex>=2023.6.3
+proglog>=0.1.10
+questionary>=2.0.1
+yt-dlp>=2023.11.16
 
 # Console and Logging
 rich>=13.5.2
