@@ -3,8 +3,9 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ashwin182607/shortfactory/blob/main/ShortFactory.ipynb)
 
-ShortFactory is an open-source AI-powered platform for automated social media short-form video creation. It streamlines content generation across multiple platforms like YouTube Shorts, TikTok, and Instagram Reels using advanced machine learning technologies.
+ShortFactory is an open-source AI-powered platform for automated social media short-form video creation, inspired by [RayVentura's ShortGPT](https://github.com/RayVentura/ShortGPT). It streamlines content generation across multiple platforms like YouTube Shorts, TikTok, and Instagram Reels using advanced machine learning technologies while building upon ShortGPT's foundation with new features and improvements.
 
 ## ✨ Features
 
@@ -17,6 +18,14 @@ ShortFactory is an open-source AI-powered platform for automated social media sh
 - 🖼️ **Asset Management**: Efficient handling of video and image assets
 
 ## 🚀 Quick Start
+
+### Google Colab (Recommended for Quick Start)
+
+1. Click the "Open in Colab" badge at the top of this README
+2. Follow the notebook instructions
+3. No local setup required!
+
+### Local Installation
 
 ### Prerequisites
 
@@ -153,9 +162,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
+- [RayVentura's ShortGPT](https://github.com/RayVentura/ShortGPT) for pioneering AI video automation
 - OpenAI for transformer models
 - TensorFlow and PyTorch communities
 - FFmpeg project
+
+## 🙏 Special Thanks
+
+This project stands on the shoulders of giants. Special thanks to:
+- [RayVentura](https://github.com/RayVentura) for creating [ShortGPT](https://github.com/RayVentura/ShortGPT), which served as the inspiration and foundation for this project
+- The open-source AI community for their invaluable contributions
 
 ## 📧 Contact
 
