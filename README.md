@@ -1,170 +1,166 @@
 # 🎬 ShortFactory
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ashwin182607/shortfactory/blob/main/ShortFactory.ipynb)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-An open-source AI video content automation platform for creating social media shorts, inspired by [ShortGPT](https://github.com/RayVentura/ShortGPT). This project builds upon the original ideas of ShortGPT while adding new features and a modern web interface.
-
-## 🙏 Acknowledgments
-
-This project is inspired by and builds upon [ShortGPT](https://github.com/RayVentura/ShortGPT) by [RayVentura](https://github.com/RayVentura). I'm grateful for  pioneering work in AI video automation.
+ShortFactory is an open-source AI-powered platform for automated social media short-form video creation. It streamlines content generation across multiple platforms like YouTube Shorts, TikTok, and Instagram Reels using advanced machine learning technologies.
 
 ## ✨ Features
 
-- 🤖 AI-powered script generation with multiple model fallbacks:
-  - Primary: GPT-Neo 125M
-  - Fallbacks: BLOOM, OPT, T5, FLAN-T5
-- 🎥 Dynamic video templates with AI transitions
-- 🎨 Modern web interface using Gradio
-- 🎵 Automated asset sourcing with fallbacks:
-  - Videos: Pexels → Pixabay → Local Assets
-  - Music: Pixabay → Free Music Archive → Local Assets
-- 🔄 Offline mode support with cached assets
-- 📱 Multi-platform support (YouTube Shorts, Instagram Reels, TikTok)
-- 🔄 Real-time preview and editing
-- 🎯 Platform-specific optimization
-- 🛠️ Customizable templates and effects
+- 🎨 **Advanced Style Transfer**: Multiple AI models for unique video styles
+- 🎯 **Multi-Platform Support**: Create content for various social media platforms
+- 🤖 **AI-Powered Generation**: Automated content creation and enhancement
+- 📊 **System Health Monitoring**: Comprehensive system checks and validation
+- 🔄 **Flexible Pipeline**: Modular architecture for easy customization
+- 🎵 **Audio Processing**: Advanced audio manipulation and enhancement
+- 🖼️ **Asset Management**: Efficient handling of video and image assets
 
 ## 🚀 Quick Start
 
-### Google Colab (Recommended)
+### Prerequisites
 
-1. Click the "Open in Colab" badge above
-2. Run the notebook cell
-3. Follow the setup instructions
+- Python 3.8 or higher
+- GPU support (optional but recommended)
+- FFmpeg installed on your system
 
-### Local Installation
+### Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/Ashwin182607/shortfactory.git
-cd shortfactory
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Ashwin182607/shortfactory.git
+   cd shortfactory
+   ```
 
-# Create virtual environment (optional but recommended)
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-.\venv\Scripts\activate  # Windows
+2. Create a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your API keys
-```
+4. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys
+   ```
 
-## 🔧 Requirements
+### Usage
 
-- Python 3.8+
-- FFmpeg
-- ImageMagick
-- GPU (optional, recommended for faster processing)
+1. Run system check:
+   ```bash
+   python utils/system_check.py
+   ```
 
-## 🎯 Usage
+2. Start ShortFactory:
+   ```bash
+   python launch.py
+   ```
 
-```python
-from factory_core.factory import ShortFactory
-from factory_core.ai.style_manager import StyleType
-
-# Initialize ShortFactory
-factory = ShortFactory()
-
-# Generate a video
-factory.create_video(
-    topic="Interesting science facts",
-    style=StyleType.EDUCATIONAL,
-    duration=60,  # seconds
-    output_path="output.mp4"
-)
-```
-
-## 🎨 Supported Styles
-
-- Educational/Informative
-- Entertainment
-- Tutorial/How-to
-- Story/Narrative
-- News/Updates
-- Lifestyle/Vlog
-
-## 🛠️ Configuration
-
-Edit `config.yaml` to customize:
-- Video settings (resolution, FPS, formats)
-- Audio settings (sample rate, formats)
-- Model settings (device, precision)
-- API settings
-- Cache settings
-- Web interface settings
-
-## 🔑 API Keys
-
-Required API keys:
-- Pexels (video/image assets)
-- Pixabay (video/image/music assets)
-- Unsplash (image assets)
-
-## 📦 Project Structure
+## 🏗️ Project Structure
 
 ```
 shortfactory/
+├── factory_core/          # Core functionality
+│   ├── ai/               # AI models and processing
+│   ├── config/           # Configuration management
+│   └── factory.py        # Main factory class
+├── utils/                # Utility functions
+├── tests/                # Test suite
 ├── assets/              # Asset storage
-├── factory_core/        # Core functionality
-│   ├── ai/             # AI models and processing
-│   ├── assets/         # Asset management
-│   ├── effects/        # Video/audio effects
-│   └── utils/          # Utility functions
-├── web_interface/      # Web UI
-├── config.yaml         # Configuration
-└── requirements.txt    # Dependencies
+├── models/              # Model storage
+└── output/              # Generated content
 ```
+
+## 🛠️ Core Components
+
+### Style Transfer Models
+
+- **Neural Style Transfer**: VGG19-based artistic style transfer
+- **Fast Style Transfer**: Real-time style transfer with residual blocks
+
+### Configuration System
+
+- Environment-based configuration
+- Comprehensive validation
+- Flexible fallback mechanisms
+
+### Asset Management
+
+- Multi-source asset fetching
+- Efficient caching
+- Format conversion
+
+## 🧪 Testing
+
+Run the test suite:
+```bash
+pytest
+```
+
+Test categories:
+- Unit tests
+- Integration tests
+- GPU-specific tests
+- Network-dependent tests
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## 📝 License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔐 Security
+
+- API keys are managed securely through environment variables
+- Asset validation before processing
+- Secure dependency management
+
+## 🎯 Roadmap
+
+- [ ] Enhanced video generation pipeline
+- [ ] More style transfer models
+- [ ] Advanced text overlay capabilities
+- [ ] Improved performance optimization
+- [ ] Extended platform support
+- [ ] Advanced audio processing
+
+## ⚡ Performance
+
+- GPU acceleration when available
+- Efficient caching mechanisms
+- Optimized asset processing
+- Parallel processing capabilities
+
+## 📚 Documentation
+
+- [Configuration Guide](docs/configuration.md)
+- [API Reference](docs/api.md)
+- [Model Documentation](docs/models.md)
+- [Contributing Guide](CONTRIBUTING.md)
 
 ## 🙏 Acknowledgments
 
-- Hugging Face for transformer models
-- MoviePy for video processing
-- PyDub for audio processing
-- Gradio for web interface
+- OpenAI for transformer models
+- TensorFlow and PyTorch communities
+- FFmpeg project
 
-## 🚨 Limitations
+## 📧 Contact
 
-- Primary AI models require more resources
-- Some fallback models may produce simpler results
-- Local asset library requires storage space
-- Initial setup needed for full offline support
-
-## 🔮 Future Plans
-
-- Multi-language support with offline language models
-- More AI model options and fallbacks
-- Advanced video effect presets
-- Cloud deployment capabilities
-- Social media direct posting
-- Batch processing
-- Expanded local asset library
-- Custom model training support
-- Automated asset caching system
-- Smart resource management
-
-## 📫 Support
-
-- Create an issue for bug reports or feature requests
-- Check existing issues before creating new ones
-- Join our community discussions
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/shortfactory&type=Date)](https://star-history.com/#yourusername/shortfactory&Date)
+For questions and support, please open an issue or contact the maintainers.
 
 ---
-Made with ❤️ 
+
+Made with ❤️ by the ShortFactory Team
