@@ -5,8 +5,14 @@ from typing import Dict, List, Optional, Union
 import os
 from pathlib import Path
 import logging
+import importlib
+import torch
+
+from rich.console import Console
+from rich.table import Table
 
 logger = logging.getLogger(__name__)
+console = Console()
 
 class ConfigValidator:
     """Validates ShortFactory configuration."""
@@ -28,7 +34,8 @@ class ConfigValidator:
             "assets": Path("assets"),
             "models": Path("models"),
             "cache": Path(".cache"),
-            "output": Path("output")
+            "output": Path("output"),
+            "logs": Path("logs"),
         }
         
         status = {}
@@ -48,91 +55,81 @@ class ConfigValidator:
     def validate_dependencies() -> Dict[str, bool]:
         """Validate required Python dependencies."""
         dependencies = {
-            "torch": "torch",
-            "transformers": "transformers",
-            "moviepy": "moviepy",
-            "gradio": "gradio",
-            "python-dotenv": "dotenv"
+            # Core
+            "torch": "PyTorch",
+            "transformers": "Transformers",
+            "gradio": "Gradio",
+            "moviepy": "MoviePy",
+            
+            # Image Processing
+            "PIL": "Pillow",
+            "cv2": "OpenCV",
+            "numpy": "NumPy",
+            
+            # Audio Processing
+            "soundfile": "SoundFile",
+            "librosa": "Librosa",
+            
+            # Text Processing
+            "nltk": "NLTK",
+            "spacy": "spaCy",
+            
+            # Utilities
+            "tqdm": "TQDM",
+            "requests": "Requests",
+            "diskcache": "DiskCache",
+            "tenacity": "Tenacity",
+            "yaml": "PyYAML",
         }
         
         status = {}
-        for name, module in dependencies.items():
+        for module_name, display_name in dependencies.items():
             try:
-                __import__(module)
-                status[name] = True
+                importlib.import_module(module_name)
+                status[display_name] = True
             except ImportError:
-                logger.error(f"Missing required dependency: {name}")
-                status[name] = False
+                status[display_name] = False
         return status
     
     @staticmethod
     def validate_gpu() -> Dict[str, Union[bool, str]]:
         """Validate GPU availability and CUDA version."""
-        try:
-            import torch
-            cuda_available = torch.cuda.is_available()
-            cuda_version = torch.version.cuda if cuda_available else None
-            device_count = torch.cuda.device_count() if cuda_available else 0
-            
-            return {
-                "cuda_available": cuda_available,
-                "cuda_version": cuda_version,
-                "device_count": device_count,
-                "device_names": [torch.cuda.get_device_name(i) for i in range(device_count)] if device_count > 0 else []
-            }
-        except Exception as e:
-            logger.error(f"Error checking GPU status: {e}")
-            return {
-                "cuda_available": False,
-                "cuda_version": None,
-                "device_count": 0,
-                "device_names": []
-            }
-    
-    @classmethod
-    def validate_all(cls) -> Dict[str, Dict]:
-        """Run all validation checks."""
-        return {
-            "api_keys": cls.validate_api_keys(),
-            "directories": cls.validate_directories(),
-            "dependencies": cls.validate_dependencies(),
-            "gpu": cls.validate_gpu()
+        status = {
+            "cuda_available": torch.cuda.is_available(),
+            "cuda_version": None,
+            "device_count": 0,
+            "device_names": [],
         }
+        
+        if status["cuda_available"]:
+            status["cuda_version"] = torch.version.cuda
+            status["device_count"] = torch.cuda.device_count()
+            status["device_names"] = [
+                torch.cuda.get_device_name(i)
+                for i in range(status["device_count"])
+            ]
+        
+        return status
     
-    @classmethod
-    def print_validation_report(cls):
-        """Print a formatted validation report."""
-        results = cls.validate_all()
+    def validate_all(self) -> Dict[str, Dict]:
+        """Run all validation checks."""
+        results = {
+            "API Keys": self.validate_api_keys(),
+            "Directories": self.validate_directories(),
+            "Dependencies": self.validate_dependencies(),
+            "GPU": self.validate_gpu(),
+        }
         
-        print("\n=== ShortFactory Validation Report ===\n")
+        # Create summary table
+        table = Table(title="ShortFactory Configuration Validation")
+        table.add_column("Category", style="cyan")
+        table.add_column("Item", style="magenta")
+        table.add_column("Status", style="green")
         
-        # API Keys
-        print("API Keys:")
-        for key, valid in results["api_keys"].items():
-            status = "✓" if valid else "✗"
-            print(f"  {status} {key}")
+        for category, items in results.items():
+            for item, status in items.items():
+                status_symbol = "[green]✓[/green]" if status else "[red]✗[/red]"
+                table.add_row(category, str(item), status_symbol)
         
-        # Directories
-        print("\nDirectories:")
-        for dir_name, valid in results["directories"].items():
-            status = "✓" if valid else "✗"
-            print(f"  {status} {dir_name}")
-        
-        # Dependencies
-        print("\nDependencies:")
-        for dep_name, valid in results["dependencies"].items():
-            status = "✓" if valid else "✗"
-            print(f"  {status} {dep_name}")
-        
-        # GPU Status
-        print("\nGPU Status:")
-        gpu = results["gpu"]
-        if gpu["cuda_available"]:
-            print(f"  ✓ CUDA {gpu['cuda_version']}")
-            print(f"  ✓ {gpu['device_count']} device(s) available")
-            for device in gpu["device_names"]:
-                print(f"    - {device}")
-        else:
-            print("  ✗ No GPU available")
-        
-        print("\n=== End Report ===\n")
+        console.print(table)
+        return results
