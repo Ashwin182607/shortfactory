@@ -1,7 +1,5 @@
 # 🎬 ShortFactory
 
-> 🚀 Your AI-powered content factory for automated short-form videos. Transform ideas into engaging social media content with advanced style transfer, smart asset management, and multi-platform optimization. Built on ShortGPT's foundation with enhanced features for the modern content creator.
-
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
