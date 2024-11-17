@@ -7,26 +7,61 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import torch
-from diskcache import Cache
-from tenacity import retry, stop_after_attempt, wait_exponential
-from transformers import (
-    AutoModelForCausalLM,
-    AutoModelForSeq2SeqLM,
-    AutoTokenizer,
-    BloomForCausalLM,
-    GPTNeoForCausalLM,
-    OPTForCausalLM,
-    Pipeline,
-    T5ForConditionalGeneration,
-    pipeline,
-)
+# Optional imports with fallbacks
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    logging.warning("PyTorch not found. Model functionality will be limited.")
+
+try:
+    from diskcache import Cache
+    DISKCACHE_AVAILABLE = True
+except ImportError:
+    DISKCACHE_AVAILABLE = False
+    logging.warning("Diskcache not found. Caching will be disabled.")
+
+try:
+    from tenacity import retry, stop_after_attempt, wait_exponential
+    TENACITY_AVAILABLE = True
+except ImportError:
+    TENACITY_AVAILABLE = False
+    logging.warning("Tenacity not found. Retry functionality will be disabled.")
+
+try:
+    from transformers import (
+        AutoModelForCausalLM,
+        AutoModelForSeq2SeqLM,
+        AutoTokenizer,
+        BloomForCausalLM,
+        GPTNeoForCausalLM,
+        OPTForCausalLM,
+        Pipeline,
+        T5ForConditionalGeneration,
+    )
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+    logging.warning("Transformers not found. AI models will be disabled.")
+    # Create dummy classes for type hints
+    class Pipeline: pass
+    class AutoModelForCausalLM: pass
+    class AutoModelForSeq2SeqLM: pass
+    class AutoTokenizer: pass
+    class BloomForCausalLM: pass
+    class GPTNeoForCausalLM: pass
+    class OPTForCausalLM: pass
+    class T5ForConditionalGeneration: pass
 
 logger = logging.getLogger(__name__)
 
 # Initialize cache
 CACHE_DIR = Path.home() / ".cache" / "shortfactory"
-cache = Cache(str(CACHE_DIR / "model_cache"))
+if DISKCACHE_AVAILABLE:
+    cache = Cache(str(CACHE_DIR / "model_cache"))
+else:
+    cache = None
 
 class ModelType(Enum):
     SCRIPT_GEN = "script_generation"
@@ -42,31 +77,31 @@ class ModelManager:
                 {
                     "name": "gpt-neo-125m",
                     "model_id": "EleutherAI/gpt-neo-125M",
-                    "model_class": GPTNeoForCausalLM,
+                    "model_class": GPTNeoForCausalLM if TRANSFORMERS_AVAILABLE else None,
                     "type": "causal",
                 },
                 {
                     "name": "bloom-560m",
                     "model_id": "bigscience/bloom-560m",
-                    "model_class": BloomForCausalLM,
+                    "model_class": BloomForCausalLM if TRANSFORMERS_AVAILABLE else None,
                     "type": "causal",
                 },
                 {
                     "name": "opt-350m",
                     "model_id": "facebook/opt-350m",
-                    "model_class": OPTForCausalLM,
+                    "model_class": OPTForCausalLM if TRANSFORMERS_AVAILABLE else None,
                     "type": "causal",
                 },
                 {
                     "name": "t5-small",
                     "model_id": "t5-small",
-                    "model_class": T5ForConditionalGeneration,
+                    "model_class": T5ForConditionalGeneration if TRANSFORMERS_AVAILABLE else None,
                     "type": "seq2seq",
                 },
                 {
                     "name": "flan-t5-small",
                     "model_id": "google/flan-t5-small",
-                    "model_class": T5ForConditionalGeneration,
+                    "model_class": T5ForConditionalGeneration if TRANSFORMERS_AVAILABLE else None,
                     "type": "seq2seq",
                 },
             ],
@@ -93,14 +128,15 @@ class ModelManager:
 
     def _initialize_cache(self):
         """Initialize the model cache directory."""
-        os.makedirs(CACHE_DIR, exist_ok=True)
-        logger.info(f"Initialized model cache at {CACHE_DIR}")
+        if DISKCACHE_AVAILABLE:
+            os.makedirs(CACHE_DIR, exist_ok=True)
+            logger.info(f"Initialized model cache at {CACHE_DIR}")
 
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
         reraise=True,
-    )
+    ) if TENACITY_AVAILABLE else lambda x: x
     async def get_model(
         self, model_type: ModelType, force_reload: bool = False
     ) -> Optional[Pipeline]:
@@ -128,11 +164,11 @@ class ModelManager:
                     model = None  # Let pipeline handle model loading
                 
                 # Create pipeline
-                model_pipeline = pipeline(
+                model_pipeline = Pipeline(
                     task=pipeline_task,
                     model=model if model else model_config["model_id"],
                     tokenizer=model_config["model_id"],
-                    device=0 if torch.cuda.is_available() else -1,
+                    device=0 if TORCH_AVAILABLE and torch.cuda.is_available() else -1,
                 )
                 
                 # Cache the model
@@ -152,13 +188,13 @@ class ModelManager:
         if model_config["type"] == "causal":
             model = model_config["model_class"].from_pretrained(
                 model_config["model_id"],
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                torch_dtype=torch.float16 if TORCH_AVAILABLE and torch.cuda.is_available() else torch.float32,
                 low_cpu_mem_usage=True,
             )
         else:  # seq2seq
             model = AutoModelForSeq2SeqLM.from_pretrained(
                 model_config["model_id"],
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                torch_dtype=torch.float16 if TORCH_AVAILABLE and torch.cuda.is_available() else torch.float32,
                 low_cpu_mem_usage=True,
             )
         return model
@@ -167,7 +203,7 @@ class ModelManager:
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
         reraise=True,
-    )
+    ) if TENACITY_AVAILABLE else lambda x: x
     async def generate_text(
         self,
         prompt: str,
@@ -182,7 +218,7 @@ class ModelManager:
         try:
             # Check cache
             cache_key = f"text_gen_{hash(prompt)}_{max_length}"
-            if cache_key in cache:
+            if cache and cache_key in cache:
                 return cache[cache_key]
             
             # Generate text
@@ -197,7 +233,8 @@ class ModelManager:
             generated_text = result[0]["generated_text"]
             
             # Cache result
-            cache[cache_key] = generated_text
+            if cache:
+                cache[cache_key] = generated_text
             
             return generated_text
             
@@ -216,7 +253,7 @@ class ModelManager:
         try:
             # Check cache
             cache_key = f"text_class_{hash(text)}_{hash(str(labels))}"
-            if cache_key in cache:
+            if cache and cache_key in cache:
                 return cache[cache_key]
             
             # Classify text
@@ -229,7 +266,8 @@ class ModelManager:
             }
             
             # Cache result
-            cache[cache_key] = classifications
+            if cache:
+                cache[cache_key] = classifications
             
             return classifications
             
@@ -239,5 +277,6 @@ class ModelManager:
 
     def clear_cache(self):
         """Clear the model cache."""
-        cache.clear()
-        logger.info("Model cache cleared")
+        if cache:
+            cache.clear()
+            logger.info("Model cache cleared")

@@ -15,6 +15,8 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from torchvision import transforms
 from transformers import AutoImageProcessor, AutoModelForImageClassification
 
+from .style_transfer import StyleTransferModel, FastStyleTransfer
+
 logger = logging.getLogger(__name__)
 
 # Initialize cache
@@ -35,6 +37,14 @@ class StyleManager:
         self.models: Dict[StyleType, List[Dict[str, any]]] = {
             StyleType.CINEMATIC: [
                 {
+                    "name": "neural-cinematic",
+                    "type": "neural",
+                },
+                {
+                    "name": "fast-cinematic",
+                    "type": "fast",
+                },
+                {
                     "name": "fastai-cinematic",
                     "path": "models/cinematic.pkl",
                     "type": "fastai",
@@ -47,9 +57,12 @@ class StyleManager:
             ],
             StyleType.VLOG: [
                 {
-                    "name": "fastai-vlog",
-                    "path": "models/vlog.pkl",
-                    "type": "fastai",
+                    "name": "neural-vlog",
+                    "type": "neural",
+                },
+                {
+                    "name": "fast-vlog",
+                    "type": "fast",
                 },
                 {
                     "name": "basic-vlog",
@@ -60,12 +73,20 @@ class StyleManager:
                         "saturation": 1.1,
                     },
                 },
+                {
+                    "name": "fastai-vlog",
+                    "path": "models/vlog.pkl",
+                    "type": "fastai",
+                },
             ],
             StyleType.MINIMAL: [
                 {
-                    "name": "fastai-minimal",
-                    "path": "models/minimal.pkl",
-                    "type": "fastai",
+                    "name": "neural-minimal",
+                    "type": "neural",
+                },
+                {
+                    "name": "fast-minimal",
+                    "type": "fast",
                 },
                 {
                     "name": "basic-minimal",
@@ -76,12 +97,20 @@ class StyleManager:
                         "saturation": 0.9,
                     },
                 },
+                {
+                    "name": "fastai-minimal",
+                    "path": "models/minimal.pkl",
+                    "type": "fastai",
+                },
             ],
             StyleType.DYNAMIC: [
                 {
-                    "name": "fastai-dynamic",
-                    "path": "models/dynamic.pkl",
-                    "type": "fastai",
+                    "name": "neural-dynamic",
+                    "type": "neural",
+                },
+                {
+                    "name": "fast-dynamic",
+                    "type": "fast",
                 },
                 {
                     "name": "basic-dynamic",
@@ -92,8 +121,18 @@ class StyleManager:
                         "saturation": 1.2,
                     },
                 },
+                {
+                    "name": "fastai-dynamic",
+                    "path": "models/dynamic.pkl",
+                    "type": "fastai",
+                },
             ],
         }
+        
+        # Initialize style transfer models
+        self.neural_transfer = StyleTransferModel()
+        self.fast_transfer = FastStyleTransfer()
+        
         self.loaded_models: Dict[str, any] = {}
         self._initialize_cache()
         self._initialize_transforms()
@@ -188,37 +227,39 @@ class StyleManager:
         strength: float = 1.0,
     ) -> Optional[torch.Tensor]:
         """Apply style transfer to video frames."""
-        model = await self.get_style_model(style_type)
-        if not model:
-            return None
-            
-        try:
-            # Check cache
-            cache_key = f"style_{style_type.value}_{hash(str(frames.shape))}_{strength}"
-            if cache_key in cache:
-                return cache[cache_key]
-            
-            # Apply style based on model type
-            if isinstance(model, dict) and "brightness" in model:
-                # Basic style
-                styled_frames = self._apply_basic_style(frames, model, strength)
-            elif isinstance(model, dict) and "model" in model:
-                # Diffusion model
-                styled_frames = await self._apply_diffusion_style(
-                    frames, model, strength
-                )
-            else:
-                # FastAI model
-                styled_frames = await self._apply_fastai_style(frames, model, strength)
-            
-            # Cache result
-            cache[cache_key] = styled_frames
-            return styled_frames
-            
-        except Exception as e:
-            logger.error(f"Style transfer failed: {str(e)}")
-            return None
+        model_config = self.get_style_model(style_type)
+        
+        if model_config["type"] == "neural":
+            return self._apply_neural_style(frames, strength)
+        elif model_config["type"] == "fast":
+            return self._apply_fast_style(frames, strength)
+        elif model_config["type"] == "fastai":
+            model = self.loaded_models.get(model_config["name"])
+            return self._apply_fastai_style(frames, model, strength)
+        elif model_config["type"] == "basic":
+            return self._apply_basic_style(frames, model_config["params"], strength)
+        elif model_config["type"] == "diffusion":
+            model = self.loaded_models.get(model_config["name"])
+            return self._apply_diffusion_style(frames, model, strength)
+        else:
+            raise ValueError(f"Unknown style type: {model_config['type']}")
 
+    def _apply_neural_style(
+        self,
+        frames: torch.Tensor,
+        strength: float = 1.0
+    ) -> torch.Tensor:
+        """Apply neural style transfer."""
+        return self.neural_transfer(frames)
+    
+    def _apply_fast_style(
+        self,
+        frames: torch.Tensor,
+        strength: float = 1.0
+    ) -> torch.Tensor:
+        """Apply fast style transfer."""
+        return self.fast_transfer(frames)
+    
     def _apply_basic_style(
         self, frames: torch.Tensor, params: Dict[str, float], strength: float
     ) -> torch.Tensor:

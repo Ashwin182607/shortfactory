@@ -6,13 +6,38 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
-import torch
-from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip
-from tenacity import retry, stop_after_attempt, wait_exponential
+# Optional imports with fallbacks
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    logging.warning("PyTorch not found. Some features will be limited.")
 
-from .ai.model_manager import ModelManager, ModelType
-from .ai.style_manager import StyleManager, StyleType
-from .assets.asset_manager import AssetManager, AssetType
+try:
+    from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip
+    MOVIEPY_AVAILABLE = True
+except ImportError:
+    MOVIEPY_AVAILABLE = False
+    logging.warning("MoviePy not found. Video editing features will be disabled.")
+
+try:
+    from tenacity import retry, stop_after_attempt, wait_exponential
+    TENACITY_AVAILABLE = True
+except ImportError:
+    TENACITY_AVAILABLE = False
+    logging.warning("Tenacity not found. Retry functionality will be disabled.")
+
+# Internal imports with error handling
+try:
+    from .ai.model_manager import ModelManager, ModelType
+    from .ai.style_manager import StyleManager, StyleType
+    from .assets.asset_manager import AssetManager, AssetType
+    INTERNAL_MODULES_AVAILABLE = True
+except ImportError as e:
+    INTERNAL_MODULES_AVAILABLE = False
+    logging.error(f"Failed to import internal modules: {e}")
+    raise ImportError("Required internal modules not found. Please install all dependencies: pip install -r requirements.txt")
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +93,7 @@ class ShortFactory:
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
         reraise=True,
-    )
+    ) if TENACITY_AVAILABLE else lambda x: x
     async def create_video(self, config: VideoConfig) -> Optional[Path]:
         """Create a video using the provided configuration."""
         try:
@@ -176,10 +201,10 @@ class ShortFactory:
         """Apply style transfer to video."""
         try:
             # Load video
-            video = VideoFileClip(str(video_path))
+            video = VideoFileClip(str(video_path)) if MOVIEPY_AVAILABLE else None
             
             # Convert to frames
-            frames = torch.tensor(list(video.iter_frames()))
+            frames = torch.tensor(list(video.iter_frames())) if TORCH_AVAILABLE else None
             
             # Apply style
             styled_frames = await self.style_manager.apply_style(
@@ -197,8 +222,8 @@ class ShortFactory:
                 audio=False,
                 fps=video.fps,
                 duration=video.duration
-            )
-            styled_video.frames = list(styled_frames.numpy())
+            ) if MOVIEPY_AVAILABLE else None
+            styled_video.frames = list(styled_frames.numpy()) if TORCH_AVAILABLE else None
             
             return styled_video
             
@@ -216,19 +241,19 @@ class ShortFactory:
         """Compose final video with music and text overlays."""
         try:
             # Load music
-            music = AudioFileClip(str(music_path))
+            music = AudioFileClip(str(music_path)) if MOVIEPY_AVAILABLE else None
             
             # Adjust music duration
             if music.duration > video.duration:
-                music = music.subclip(0, video.duration)
+                music = music.subclip(0, video.duration) if MOVIEPY_AVAILABLE else None
             else:
-                music = music.loop(duration=video.duration)
+                music = music.loop(duration=video.duration) if MOVIEPY_AVAILABLE else None
             
             # Set music volume
-            music = music.volumex(0.3)
+            music = music.volumex(0.3) if MOVIEPY_AVAILABLE else None
             
             # Add music to video
-            video = video.set_audio(music)
+            video = video.set_audio(music) if MOVIEPY_AVAILABLE else None
             
             # Generate text overlays (simplified for now)
             # TODO: Add more sophisticated text animations
@@ -242,7 +267,7 @@ class ShortFactory:
                 codec="libx264",
                 audio_codec="aac",
                 fps=30
-            )
+            ) if MOVIEPY_AVAILABLE else None
             
             return output_path
             

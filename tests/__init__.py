@@ -1,0 +1,3 @@
+"""
+ShortFactory test suite.
+"""
